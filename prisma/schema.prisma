@@ -18,8 +18,9 @@ model User{
   id Int @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  name String
-  mail String
+  name String 
+  mail String @unique
   hash String
-  
+  role String?
+  @@map("user")
 }
