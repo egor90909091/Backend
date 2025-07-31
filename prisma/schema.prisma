@@ -21,6 +21,6 @@ model User{
   name String 
   mail String @unique
   hash String
-  role String?
+  role String
   @@map("user")
 }
