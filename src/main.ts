@@ -20,7 +20,7 @@ async function bootstrap() {
   // Подключение Swagger UI к пути '/api'
   SwaggerModule.setup('api', app, document);
   app.use(cookieParser())
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 5001);
 
 }
 bootstrap();

@@ -6,6 +6,7 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { Role } from "src/common/enums/role.enum";
+import { LoginDto } from "./dto/login.dto";
 
 
 
@@ -35,6 +36,7 @@ export class AuthService{
         });
         //возвращаем сохраненного юзера без хэша
         return this.signToken(user.id,user.mail, user.role );
+        
         }
         catch (error){
             if (error instanceof PrismaClientKnownRequestError){
@@ -48,7 +50,7 @@ export class AuthService{
         
     }
 
-    async signin(dto:AuthDto){
+    async login(dto:LoginDto){
         //находим пользователя по мейлу
         
         const user = await this.prisma.user.findUnique({
@@ -63,7 +65,13 @@ export class AuthService{
         // если пароль неправильный выкидываем исключение
         if (!pwMatches) throw new ForbiddenException('Password incorrect');
         const { hash, ...userWithoutHash } = user;
-        return userWithoutHash;
+        const tokens= await this.signToken(user.id,user.mail, user.role );
+        return {
+        user: userWithoutHash,
+        access_token: tokens.access_token,
+        refresh_token: tokens.refresh_token,
+        };
+
 
     }
     //функция выдачи токена 
@@ -100,7 +108,7 @@ export class AuthService{
         }
     }
 
-
+    
     async refreshTokens(refreshToken: string) {
     if (!refreshToken) throw new UnauthorizedException('Refresh token отсутствует');
     try {

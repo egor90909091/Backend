@@ -21,13 +21,14 @@ export class UserController {
     return this.usersService.findAll();
     }
 
-
+    
     @Get(':id')
     async getUserById(@Param('id', ParseIntPipe) id: number): Promise<{id: number; mail: string; name: string; role:string} | null> {
     return this.usersService.findOne(id);
 
     
     }
+    @Roles('ADMIN','USER')
     @Put(':id')
     async updateUserById(
         @Param('id', ParseIntPipe) id: number,       // получаем id из URL и преобразуем в число
@@ -35,7 +36,7 @@ export class UserController {
     ): Promise<User> {
         return this.usersService.updateUser(id, updateUserDto);  // вызываем сервис для обновления
     }
-
+    @Roles('ADMIN')
     @Delete(':id')
     async deleteUserById(@Param('id', ParseIntPipe) id: number){
         return this.usersService.deleteUser(id);

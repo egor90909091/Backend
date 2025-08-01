@@ -1,13 +1,14 @@
-import { Body, Controller, Post,Req ,Res} from "@nestjs/common";
+import { Body, Controller, Post,Req ,Res, UseGuards,Get} from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { AuthDto } from "./dto";
-
 import { Request,Response }  from 'express';
+import { LoginDto } from "./dto/login.dto";
+import { JwtGuard } from "./guard";
 @Controller('auth')
 export class AuthController{
     constructor(private authService :AuthService) {}
 
-    @Post('registr')
+    @Post('register')
     registr(@Body()dto:AuthDto) {
         console.log({
             
@@ -16,26 +17,29 @@ export class AuthController{
         return this.authService.register(dto);
     }
 
-    @Post('signin')
-    signin(@Body()dto:AuthDto){
-        return this.authService.signin(dto);
+   
+    @Post('login')
+    async login(@Body() dto: LoginDto) {
+    const { user, access_token, refresh_token } = await this.authService.login(dto);
+    
+    return {
+        user,
+        accessToken: access_token,
+        refreshToken: refresh_token,
+    };
+}
+
+    @Get('check')
+    @UseGuards(JwtGuard)
+    check(@Req() req){return {user: req.user}}
+
+
+    @Post('refresh')
+    async refreshTokens(@Body() body: { refreshToken: string }) {
+    const { refreshToken } = body;
+    const { access_token, refresh_token } = await this.authService.refreshTokens(refreshToken);
+    return { accessToken: access_token, refreshToken: refresh_token };
     }
 
-    @Post('refresh-tokens')
-    async refreshTokens(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-        console.log(req.cookies)
-        const refreshToken = req.cookies['refresh_token'];
-        const { access_token, refresh_token } = await this.authService.refreshTokens(refreshToken);
-
-
-        // Сохраняем новый refresh token в куку на 7 дней
-        res.cookie('refresh_token', refresh_token, {
-        httpOnly: true,
-        path: '/auth/refresh-tokens',
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
-
-        return { access_token }
-    }
     }
 
