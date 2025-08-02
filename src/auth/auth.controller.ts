@@ -43,7 +43,9 @@ export class AuthController{
         refreshToken: refresh_token,
     };
 }
-    
+    @ApiOperation({ summary: 'Проверка действительности JWT токена' })
+    @ApiResponse({ status: 200, description: 'Данные текущего пользователя' })
+    @ApiResponse({ status: 401, description: 'Токен отсутствует или недействителен' })
     @Get('check')
     @UseGuards(JwtGuard)
     check(@Req() req){return {user: req.user}}

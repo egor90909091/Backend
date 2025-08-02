@@ -58,7 +58,10 @@ paths:
       parameters: []
       responses:
         '200':
-          description: ''
+          description: Данные текущего пользователя
+        '401':
+          description: Токен отсутствует или недействителен
+      summary: Проверка действительности JWT токена
       tags: *ref_0
   /auth/refresh:
     post:
