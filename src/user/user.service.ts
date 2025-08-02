@@ -2,28 +2,36 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service'; // ваш сервис Prisma
 import { User } from '@prisma/client';
 import { UpdateUserDto } from './user-dto/update-user.dto';
+import { Role } from 'src/common/enums/role.enum';
+import { UserResponseDto } from './user-dto/userResponse.Dto';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findOne(id: number): Promise<{id: number; mail: string; name: string;role:string} | null> {
-    return this.prisma.user.findUnique({
+  async findOne(id: number): Promise<UserResponseDto | null> {
+  const user = await this.prisma.user.findUnique({
     where: { id },
     select: {
       id: true,
       mail: true,
       name: true,
-      role:true,
+      role: true,
     },
   });
-}
 
+  return user
+      ? {
+          ...user,
+          role: user.role as Role, //приводим к типу роль
+        }
+      : null;
+  }
 
   
-  async findAll(): Promise<{id: number; mail: string; name: string;role:string}[]> {
+  async findAll(): Promise<UserResponseDto[]> {
     
-    return this.prisma.user.findMany({
+    const users= await this.prisma.user.findMany({
     select: {
       id: true,
       mail: true,
@@ -32,8 +40,16 @@ export class UsersService {
       
     },
   });
+  return users.map(user => ({
+    id: user.id,
+    mail: user.mail,
+    name: user.name,
+    role: user.role as Role,
+  }));
   }
-  async updateUser(id: number, data: UpdateUserDto): Promise<User> {
+
+
+  async updateUser(id: number, data: UpdateUserDto): Promise<UpdateUserDto> {
     // Проверяем, что пользователь существует
     const existingUser = await this.prisma.user.findUnique({ where: { id } });
     if (!existingUser) {
@@ -41,7 +57,7 @@ export class UsersService {
     }
 
     // Обновляем пользователя
-    return this.prisma.user.update({
+    const updatedUser = await this.prisma.user.update({
       where: { id },
       data: {
         name: data.name,
@@ -50,6 +66,14 @@ export class UsersService {
         updatedAt: new Date(), 
       },
     });
+    return {
+    
+    email: updatedUser.mail,
+    name: updatedUser.name,
+    role: updatedUser.role as Role,
+    updatedAt: updatedUser.updatedAt,
+  };
+    
 
   }
    async deleteUser(id: number){

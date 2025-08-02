@@ -1,0 +1,311 @@
+openapi: 3.0.0
+paths:
+  /:
+    get:
+      operationId: AppController_getHello
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - App
+  /auth/register:
+    post:
+      operationId: AuthController_registr
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthDto'
+      responses:
+        '201':
+          description: Пользователь зарегистрирован и получены токены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokensDto'
+        '403':
+          description: Почта уже используется
+      summary: Регистрация нового пользователя
+      tags: &ref_0
+        - Аутентификация
+  /auth/login:
+    post:
+      operationId: AuthController_login
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginDto'
+      responses:
+        '200':
+          description: Успешный вход
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponseDto'
+        '403':
+          description: Неверный email или пароль
+      summary: 'Авторизация пользователя '
+      tags: *ref_0
+  /auth/check:
+    get:
+      operationId: AuthController_check
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: *ref_0
+  /auth/refresh:
+    post:
+      operationId: AuthController_refreshTokens
+      parameters: []
+      responses:
+        '200':
+          description: Новые токены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokensDto'
+      summary: Обновление токенов
+      tags: *ref_0
+  /users:
+    get:
+      operationId: UserController_getAllUsers
+      parameters: []
+      responses:
+        '200':
+          description: >-
+            Список пользователей (пустой массив если пользователей нет); Доступ
+            роль:ADMIN
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponseDto'
+      summary: Получить всех пользователей
+      tags: &ref_1
+        - User
+  /users/{id}:
+    get:
+      operationId: UserController_getUserById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Получить пользоваетеля по ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDto'
+      summary: Получить пользоваетеля по ID
+      tags: *ref_1
+    put:
+      operationId: UserController_updateUserById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserDto'
+      responses:
+        '200':
+          description: Пользователь успешно обновлён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateUserDto'
+        '404':
+          description: Пользователь не найден; Доступ роль:ADMIN
+      summary: Обновить пользователя по ID
+      tags: *ref_1
+    delete:
+      operationId: UserController_deleteUserById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Пользователь успешно удалён; Доступ роль:ADMIN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDto'
+        '404':
+          description: Пользователь не найден
+      summary: Удалить пользователя по ID
+      tags: *ref_1
+info:
+  title: API Документация
+  description: Надеюсь не все так плохо как мне кажется
+  version: '1.0'
+  contact:
+    name: Egor
+    url: https://t.me/egor90909091
+    email: n778hr@mail.ru
+tags: []
+servers: []
+components:
+  securitySchemes:
+    access-token:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+      in: header
+  schemas:
+    AuthDto:
+      type: object
+      properties:
+        mail:
+          type: string
+          example: nice@mail.ru
+          description: Почта
+        password:
+          type: string
+          example: password123
+          description: Пароль
+        name:
+          type: string
+          example: Егор
+          description: Имя
+        role:
+          type: string
+          example: ADMIN
+          description: Роль
+      required:
+        - mail
+        - password
+        - name
+        - role
+    TokensDto:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          example: eyJh...
+        refreshToken:
+          type: string
+          example: eyJh...
+      required:
+        - accessToken
+        - refreshToken
+    LoginDto:
+      type: object
+      properties:
+        mail:
+          type: string
+          example: nice@mail.ru
+          description: Почта
+        password:
+          type: string
+          example: password123
+          description: Пароль
+      required:
+        - mail
+        - password
+    UserDto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+        mail:
+          type: string
+          example: nice@mail.ru
+        name:
+          type: string
+          example: Егор
+        role:
+          type: string
+          example: ADMIN
+          enum:
+            - USER
+            - ADMIN
+            - MANAGER
+      required:
+        - id
+        - mail
+        - name
+        - role
+    AuthResponseDto:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/UserDto'
+        tokens:
+          $ref: '#/components/schemas/TokensDto'
+      required:
+        - user
+        - tokens
+    UserResponseDto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: ID пользователя
+        mail:
+          type: string
+          example: user@example.com
+          description: Электронная почта
+        name:
+          type: string
+          example: Егор
+          description: Имя
+        role:
+          type: string
+          example: ADMIN
+          description: Роль пользователя
+      required:
+        - id
+        - mail
+        - name
+        - role
+    UpdateUserDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Егор
+          description: Имя
+        email:
+          type: string
+          example: nice@mail.ru
+          description: Электронная почта
+        role:
+          type: string
+          example: ADMIN
+          description: Роль
+        password:
+          type: string
+          example: password123
+          description: Пароль
+        updatedAt:
+          format: date-time
+          type: string
+          example: '2025-08-02T12:00:00Z'
+          description: Дата обновления
+      required:
+        - name
+        - email
+        - role
+        - password
+        - updatedAt

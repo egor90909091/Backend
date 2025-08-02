@@ -35,7 +35,18 @@ export class AuthService{
             
         });
         //возвращаем сохраненного юзера без хэша
-        return this.signToken(user.id,user.mail, user.role );
+        
+        const { hash: _, ...userWithoutHash } = user;
+
+        // Генерируем токены
+        const tokens = await this.signToken(user.id, user.mail, user.role);
+
+        // Возвращаем объект с пользователем и токенами
+        return {
+        user: userWithoutHash,
+        accessToken: tokens.access_token,
+        refreshToken: tokens.refresh_token,
+        };
         
         }
         catch (error){
