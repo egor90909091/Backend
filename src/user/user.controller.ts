@@ -1,6 +1,5 @@
 
 import { Controller,Get, UseGuards,Param, ParseIntPipe ,Put,Body,Delete} from '@nestjs/common';
-import { Request } from 'express';
 import { JwtGuard } from 'src/auth/guard';
 import { RolesGuard } from 'src/auth/guard/role.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
@@ -42,7 +41,7 @@ export class UserController {
     return this.usersService.findOne(id); }
 
 
-    
+
     @Roles('ADMIN','USER')
     @Put(':id')
     @ApiOperation({ summary: 'Обновить пользователя по ID' })
