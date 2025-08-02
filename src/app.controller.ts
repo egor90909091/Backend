@@ -1,12 +1,12 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, All ,NotFoundException} from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @All('*')  // ловит все запросы, которые не подходят под существующие маршруты
+  handleAll() {
+    throw new NotFoundException('Ресурс не найден');
   }
 }

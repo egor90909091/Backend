@@ -1,14 +1,63 @@
 openapi: 3.0.0
 paths:
-  /:
+  /{path}:
     get:
-      operationId: AppController_getHello
+      operationId: AppController_handleAll_get
       parameters: []
       responses:
         '200':
           description: ''
-      tags:
+      tags: &ref_0
         - App
+    post:
+      operationId: AppController_handleAll_post
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: *ref_0
+    put:
+      operationId: AppController_handleAll_put
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: *ref_0
+    delete:
+      operationId: AppController_handleAll_delete
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: *ref_0
+    patch:
+      operationId: AppController_handleAll_patch
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: *ref_0
+    options:
+      operationId: AppController_handleAll_options
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: *ref_0
+    head:
+      operationId: AppController_handleAll_head
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: *ref_0
+    search:
+      operationId: AppController_handleAll_search
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: *ref_0
   /auth/register:
     post:
       operationId: AuthController_registr
@@ -29,7 +78,7 @@ paths:
         '403':
           description: Почта уже используется
       summary: Регистрация нового пользователя
-      tags: &ref_0
+      tags: &ref_1
         - Аутентификация
   /auth/login:
     post:
@@ -51,7 +100,7 @@ paths:
         '403':
           description: Неверный email или пароль
       summary: 'Авторизация пользователя '
-      tags: *ref_0
+      tags: *ref_1
   /auth/check:
     get:
       operationId: AuthController_check
@@ -62,7 +111,7 @@ paths:
         '401':
           description: Токен отсутствует или недействителен
       summary: Проверка действительности JWT токена
-      tags: *ref_0
+      tags: *ref_1
   /auth/refresh:
     post:
       operationId: AuthController_refreshTokens
@@ -75,7 +124,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TokensDto'
       summary: Обновление токенов
-      tags: *ref_0
+      tags: *ref_1
   /users:
     get:
       operationId: UserController_getAllUsers
@@ -92,7 +141,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/UserResponseDto'
       summary: Получить всех пользователей
-      tags: &ref_1
+      tags: &ref_2
         - User
   /users/{id}:
     get:
@@ -111,7 +160,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserResponseDto'
       summary: Получить пользоваетеля по ID
-      tags: *ref_1
+      tags: *ref_2
     put:
       operationId: UserController_updateUserById
       parameters:
@@ -136,7 +185,7 @@ paths:
         '404':
           description: Пользователь не найден; Доступ роль:ADMIN
       summary: Обновить пользователя по ID
-      tags: *ref_1
+      tags: *ref_2
     delete:
       operationId: UserController_deleteUserById
       parameters:
@@ -155,7 +204,7 @@ paths:
         '404':
           description: Пользователь не найден
       summary: Удалить пользователя по ID
-      tags: *ref_1
+      tags: *ref_2
 info:
   title: API Документация
   description: Надеюсь не все так плохо как мне кажется
